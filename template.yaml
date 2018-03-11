@@ -1,0 +1,17 @@
+root:
+  - .travis.yml
+  - travis-script.sh
+  - .gitignore
+module:
+  - name: moduleA
+    content:
+      - name: fileA.tf
+      - name: fileB.tf
+      - name: fileC.tf
+directory:
+  - path: ./dev
+    content:
+      - name: main.tf
+      - name: prod-tfstate.config
+
+
