@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"strings"
 
 	yaml "gopkg.in/yaml.v2"
@@ -19,6 +21,7 @@ type Config struct {
 
 type Content []struct {
 	Name string
+	Source
 }
 
 type Module []struct {
@@ -30,6 +33,12 @@ type Directory []struct {
 	Path string
 	Content
 }
+
+type Source []struct {
+	EC2
+}
+
+// Terraform object structs
 
 func main() {
 	repo := flag.String("name", "", "Repository name")
@@ -54,22 +63,19 @@ func main() {
 			strings.Join([]string{*repo, ".travis_script.sh"}, "/"),
 		}
 
-		for i := range folders {
-			f := folders[i]
-			createDirectory(f)
-			fmt.Printf("Generating %s directory\n", f)
+		for _, folder := range folders {
+			createDirectory(folder)
+			fmt.Printf("Generating %s directory\n", folder)
 		}
 
-		for i := range files {
-			f := files[i]
-			createFile(f)
-			fmt.Printf("Generating %s file\n", f)
+		for _, file := range files {
+			createFile(file, "")
+			fmt.Printf("Generating %s file\n", file)
 		}
 	} else {
 		template, err := ioutil.ReadFile(*tplFile)
-		var config Config
-
 		check(err)
+		config := Config{}
 
 		err = yaml.Unmarshal(template, &config)
 		check(err)
@@ -77,42 +83,51 @@ func main() {
 		fmt.Printf("%#v\n", config.Module)
 
 		if len(config.Root) > 0 {
-			for i := range config.Root {
-				f := config.Root[i]
-				createFile(strings.Join([]string{*repo, f}, "/"))
-				fmt.Printf("Generating %s file\n", f)
+			for _, file := range config.Root {
+				createFile(strings.Join([]string{*repo, file}, "/"), "")
+				fmt.Printf("Generating %s file\n", file)
 			}
 		}
 
 		if len(config.Module) > 0 {
 			createDirectory(strings.Join([]string{*repo, "modules"}, "/"))
 			fmt.Printf("Generating modules directory\n")
-			for i := range config.Module {
-				moduleName := config.Module[i].Name
+			for _, module := range config.Module {
+				moduleName := module.Name
 				createDirectory(strings.Join([]string{*repo, "modules", moduleName}, "/"))
 				fmt.Printf("Generating modules %s directory\n", moduleName)
 				// Generating module content
-				for j := range config.Module[i].Content {
-					fileName := config.Module[i].Content[j].Name
-					createFile(strings.Join([]string{*repo, "modules", moduleName, fileName}, "/"))
+				for _, content := range module.Content {
+					fileName := content.Name
+					source := content.Source
+					var buffer bytes.Buffer
+
+					for _, sourceType := range source {
+						buffer.WriteString(sourceType.EC2.generateContent())
+					}
+
+					createFile(strings.Join([]string{*repo, "modules", moduleName, fileName}, "/"), buffer.String())
 					fmt.Printf("Generating modules %s content: %s \n", moduleName, fileName)
+
 				}
 			}
 		}
 
 		if len(config.Directory) > 0 {
-			for i := range config.Directory {
-				dirPath := config.Directory[i].Path
+			for _, dir := range config.Directory {
+				dirPath := dir.Path
 				createPath(strings.Join([]string{*repo, dirPath}, "/"))
 				fmt.Printf("Generating directory %s\n", dirPath)
 				// Generating directory content
-				for j := range config.Directory[i].Content {
-					fileName := config.Directory[i].Content[j].Name
-					createFile(strings.Join([]string{*repo, dirPath, fileName}, "/"))
+				for _, content := range dir.Content {
+					fileName := content.Name
+					createFile(strings.Join([]string{*repo, dirPath, fileName}, "/"), "")
 					fmt.Printf("Generating direcotry %s content: %s \n", dirPath, fileName)
 				}
 			}
 		}
+		// Lint all terraform files
+		lintFiles()
 	}
 }
 
@@ -125,18 +140,28 @@ func check(e error) {
 func createDirectory(directoryPath string) {
 	//choose your permissions well
 	err := os.Mkdir(directoryPath, 0777)
-
 	check(err)
 }
 
 func createPath(path string) {
 	err := os.MkdirAll(path, os.ModePerm)
-
 	check(err)
 }
 
-func createFile(filePath string) {
-	newFile, err := os.Create(filePath)
+func createFile(filePath string, content string) {
+	err := ioutil.WriteFile(filePath, []byte(content), 0644)
 	check(err)
-	newFile.Close()
+	//newFile, err := os.Create(filePath)
+	//check(err)
+	//newFile.Close()
+}
+
+func lintFiles() {
+	cmd := "terraform"
+	args := []string{"fmt", "."}
+	if err := exec.Command(cmd, args...).Run(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	fmt.Println("Linted terraform files")
 }

@@ -5,7 +5,16 @@ root:
 module:
   - name: moduleA
     content:
-      - name: fileA.tf
+      - name: application1.tf
+        source:
+          - ec2:
+              name: application
+              ami: xxx
+              availability_zone: a
+              vpc_security_group_ids:
+                - vpc1
+                - vpc2
+                - vpc3
       - name: fileB.tf
       - name: fileC.tf
 directory:
