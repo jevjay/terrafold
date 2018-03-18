@@ -38,6 +38,10 @@ type Source []struct {
 	EC2
 }
 
+type AWSObject interface {
+	generateContent() string
+}
+
 // Terraform object structs
 
 func main() {

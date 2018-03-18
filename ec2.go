@@ -48,32 +48,32 @@ type RootBlockDevice struct {
 	VolumeType          string `yaml:"volume_type"`
 	VolumeSize          string `yaml:"volume_size"`
 	Iops                string `yaml:"iops"`
-	DeleteOnTermination string `yaml:"delete_on_termination"`
+	DeleteOnTermination bool   `yaml:"delete_on_termination"`
 }
 
 type EbsBlockDevice struct {
 	DeviceName          string `yaml:"device_name"`
 	SnapshotID          string `yaml:"snapshot_id"`
 	VolumeType          string `yaml:"volume_type"`
-	VolumeSize          string `yaml:"volume_size"`
+	VolumeSize          int    `yaml:"volume_size"`
 	Iops                string `yaml:"iops"`
-	DeleteOnTermination string `yaml:"delete_on_termination"`
-	Encrypted           string `yaml:"encrypted"`
+	DeleteOnTermination bool   `yaml:"delete_on_termination"`
+	Encrypted           bool   `yaml:"encrypted"`
 }
 
 type EphemeralBlockDevice struct {
-	DeviceName  string `yaml:"encrypted"`
-	VirtualName string `yaml:"encrypted"`
-	NoDevice    string `yaml:"encrypted"`
+	DeviceName  string `yaml:"device_name"`
+	VirtualName string `yaml:"virtual_name"`
+	NoDevice    bool   `yaml:"no_device"`
 }
 
 type NetworkInterface struct {
 	DeviceIndex         string `yaml:"device_index"`
-	NetworkInterfaceId  string `yaml:"network_interface_id"`
+	NetworkInterfaceID  string `yaml:"network_interface_id"`
 	DeleteOnTermination string `yaml:"delete_on_termination"`
 }
 
-const tmpl = `
+const ec2tmpl = `
 resource "aws_instance" "{{.Name}}" {
 	{{- if .Ami }}
 	ami = "{{.Ami}}"
@@ -146,7 +146,7 @@ resource "aws_instance" "{{.Name}}" {
 
 func (e EC2) generateContent() string {
 	t := template.New("Ec2 template")
-	t, err := t.Parse(tmpl)
+	t, err := t.Parse(ec2tmpl)
 
 	check(err)
 	var tpl bytes.Buffer

@@ -15,7 +15,16 @@ module:
                 - vpc1
                 - vpc2
                 - vpc3
+          - ec2:
+              name: application2
+              ami: xxx
+              availability_zone: b
       - name: fileB.tf
+        source:
+          - ec2:
+              name: applicationB
+              ami: xxx
+              availability_zone: b
       - name: fileC.tf
 directory:
   - path: ./dev
