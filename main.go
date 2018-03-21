@@ -35,7 +35,8 @@ type Directory []struct {
 }
 
 type Source []struct {
-	EC2
+	EC2    *EC2
+	Bucket *Bucket
 }
 
 type AWSObject interface {
@@ -108,6 +109,7 @@ func main() {
 
 					for _, sourceType := range source {
 						buffer.WriteString(sourceType.EC2.generateContent())
+						buffer.WriteString(sourceType.Bucket.generateContent())
 					}
 
 					createFile(strings.Join([]string{*repo, "modules", moduleName, fileName}, "/"), buffer.String())
@@ -155,9 +157,6 @@ func createPath(path string) {
 func createFile(filePath string, content string) {
 	err := ioutil.WriteFile(filePath, []byte(content), 0644)
 	check(err)
-	//newFile, err := os.Create(filePath)
-	//check(err)
-	//newFile.Close()
 }
 
 func lintFiles() {

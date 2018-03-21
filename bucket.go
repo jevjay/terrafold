@@ -6,24 +6,24 @@ import (
 )
 
 type Bucket struct {
-	Name               string `yaml:"name"`
-	Bucket             string `yaml:"bucket"`
-	BucketPrefix       string `yaml:"bucket_prefix"`
-	ACL                string `yaml:"acl"`
-	Policy             string `yaml:"policy"`
-	ForceDestroy       bool   `yaml:"force_destroy"`
-	AccelerationStatus string `yaml:"acceleration_status"`
-	Region             string `yaml:"region"`
-	RequestPayer       string `yaml:"request_payer"`
+	Name               string `yaml:"name,omitempty"`
+	Bucket             string `yaml:"bucket,omitempty"`
+	BucketPrefix       string `yaml:"bucket_prefix,omitempty"`
+	ACL                string `yaml:"acl,omitempty"`
+	Policy             string `yaml:"policy,omitempty"`
+	ForceDestroy       bool   `yaml:"force_destroy,omitempty"`
+	AccelerationStatus string `yaml:"acceleration_status,omitempty"`
+	Region             string `yaml:"region,omitempty"`
+	RequestPayer       string `yaml:"request_payer,omitempty"`
 
-	ServerSideEncryptionConfiguration `yaml:"server_side_encryption_configuration"`
-	ReplicationConfiguration          `yaml:"replication_configuration"`
-	LifecycleRule                     `yaml:"lifecycle_rule"`
-	Logging                           `yaml:"logging"`
-	Versioning                        `yaml:"versioning"`
-	CorsRule                          `yaml:"cors_rule"`
-	Website                           `yaml:"website"`
-	Tags                              `yaml:"tags"`
+	ServerSideEncryptionConfiguration `yaml:"server_side_encryption_configuration,omitempty"`
+	ReplicationConfiguration          `yaml:"replication_configuration,omitempty"`
+	LifecycleRule                     `yaml:"lifecycle_rule,omitempty"`
+	Logging                           `yaml:"logging,omitempty"`
+	Versioning                        `yaml:"versioning,omitempty"`
+	CorsRule                          `yaml:"cors_rule,omitempty"`
+	Website                           `yaml:"website,omitempty"`
+	Tags                              `yaml:"tags,omitempty"`
 }
 
 type LifecycleRule struct {
@@ -41,8 +41,8 @@ type LifecycleRule struct {
 
 type Expiration struct {
 	Date                      string `yaml:"date"`
-	Days                      string `yaml:"days"`
-	ExpiredObjectDeleteMarker string `yaml:"expired_object_delete_marker"`
+	Days                      int    `yaml:"days"`
+	ExpiredObjectDeleteMarker bool   `yaml:"expired_object_delete_marker"`
 }
 
 type Transition struct {
@@ -66,7 +66,7 @@ type Logging struct {
 }
 
 type Versioning struct {
-	enabled   bool `yaml:"enabled"`
+	Enabled   bool `yaml:"enabled"`
 	MfaDelete bool `yaml:"mfa_delete"`
 }
 
@@ -128,7 +128,7 @@ type Website struct {
 }
 
 const s3tmpl = `
-resource "aws_instance" "{{.Name}}" {
+resource "aws_s3_bucket" "{{.Name}}" {
 	{{- if .Bucket }}
 	bucket = "{{.Bucket}}"
 	{{- end}}
@@ -153,45 +153,159 @@ resource "aws_instance" "{{.Name}}" {
 	{{- if .RequestPayer}}
 	request_payer = {{.RequestPayer}}
 	{{- end}}
+	
 	{{- if .ServerSideEncryptionConfiguration}}
-	instance_initiated_shutdown_behavior {
+	server_side_encryption_configuration {
 		rule {
 			apply_server_side_encryption_by_default {
-				kms_master_key_id = "{{.InstanceInitiatedShutdownBehavior.Rule.ApplyServerSideEncryptionByDefault.KmsMasterKeyID}}"
-				sse_algorithm = "{{.InstanceInitiatedShutdownBehavior.Rule.ApplyServerSideEncryptionByDefault.SseAlgorithm}}"
+				kms_master_key_id = "{{.ServerSideEncryptionConfiguration.Rule.ApplyServerSideEncryptionByDefault.KmsMasterKeyID}}"
+				sse_algorithm = "{{.ServerSideEncryptionConfiguration.Rule.ApplyServerSideEncryptionByDefault.SseAlgorithm}}"
 			}
 		}
 	}
 	{{- end}}
+
 	{{- if .ReplicationConfiguration}}
 	replication_configuration {
 		role = "{{.ReplicationConfiguration.Role}}"
 		rules {
-			id = "{{.ReplicationConfiguration.Role.ID}}"
-			prefix = "{{.ReplicationConfiguration.Role.Prefix}}"
-			status = "{{.ReplicationConfiguration.Role.Status}}"
+			{{- if .ReplicationConfiguration.Rules.ID}}
+			id = "{{.ReplicationConfiguration.Rules.ID}}"
+			{{- end}}
+			prefix = "{{.ReplicationConfiguration.Rules.Prefix}}"
+			status = "{{.ReplicationConfiguration.Rules.Status}}"
 
 			destination {
-				bucket = "{{.ReplicationConfiguration.Role.Destination.Bucket}}"
-				storage_class = "{{.ReplicationConfiguration.Role.Destination.StorageClass}}"
-				replica_kms_key_id = "{{.ReplicationConfiguration.Role.Destination.ReplicaKmsKeyID}}"
+				bucket = "{{.ReplicationConfiguration.Rules.Destination.Bucket}}"
+				storage_class = "{{.ReplicationConfiguration.Rules.Destination.StorageClass}}"
+				replica_kms_key_id = "{{.ReplicationConfiguration.Rules.Destination.ReplicaKmsKeyID}}"
 			}
-
+			{{- if .ReplicationConfiguration.Rules.SourceSelectionCriteria}}
 			source_selection_criteria {
 				sse_kms_encrypted_objects {
-					enabled = "{{.ReplicationConfiguration.Role.SourceSelectionCriteria.SseKmsEncryptedObjects.Enabled}}"
+					enabled = "{{.ReplicationConfiguration.Rules.SourceSelectionCriteria.SseKmsEncryptedObjects.Enabled}}"
 				}
 			}
-		} ""
+			{{- end}}
+		}
+	}
+	{{- end}}
+
+	{{- if .LifecycleRule}}
+	lifecycle_rule {
+		enabled = "{{.LifecycleRule.Enabled}}"
+		{{- if .LifecycleRule.ID}}
+		id = "{{.LifecycleRule.ID}}"
+		{{- end}}
+		{{- if .LifecycleRule.Prefix}}
+		prefix = {{.LifecycleRule.Prefix}}
+		{{- end}}
+		{{- if .LifecycleRule.AbortIncompleteMultipartUploadDays}}
+		abort_incomplete_multipart_upload_days = {{.LifecycleRule.AbortIncompleteMultipartUploadDays}}
+		{{- end}}
+
+		{{- if .LifecycleRule.Expiration}}
+		expiration {
+			{{- if .LifecycleRule.Expiration.Date}}
+			date = "{{.LifecycleRule.Expiration.Date}}"
+			{{- end}}
+			{{- if .LifecycleRule.Expiration.Days}}
+			days = {{.LifecycleRule.Expiration.Days}}
+			{{- end}}
+			{{- if .LifecycleRule.Expiration.ExpiredObjectDeleteMarker}}
+			expired_object_delete_marker = {{.LifecycleRule.Expiration.ExpiredObjectDeleteMarker}}
+			{{- end}}
+		}
+		{{- end}}
+
+		{{- if .LifecycleRule.Transition}}
+		transition {
+			{{- if .LifecycleRule.Transition.Days}}
+			days = {{.LifecycleRule.Transition.Days}}
+			{{- end}}
+			{{- if .LifecycleRule.Transition.StorageClass}}
+			storage_class = "{{.LifecycleRule.Transition.StorageClass}}"
+			{{- end}}
+		}
+		{{- end}}
+
+		{{- if .LifecycleRule.NoncurrentVersionTransition}}
+		noncurrent_version_transition {
+			{{- if .LifecycleRule.NoncurrentVersionTransition.Days}}
+			days = {{.LifecycleRule.NoncurrentVersionTransition.Days}}
+			{{- end}}
+			{{- if .LifecycleRule.NoncurrentVersionTransition.StorageClass}}
+			storage_class = "{{.LifecycleRule.NoncurrentVersionTransition.StorageClass}}"
+			{{- end}}
+		  }
+		{{- end}}
+
+		{{- if .LifecycleRule.NoncurrentVersionExpiration}}
+		noncurrent_version_expiration {
+			{{- if .LifecycleRule.NoncurrentVersionExpiration.Days}}
+			days = {{.LifecycleRule.NoncurrentVersionExpiration.Days}}
+			{{- end}}
+		}
+		{{- end}}
+	}
+	{{- end}}
+
+	{{- if .Logging}}
+	logging {
+		target_bucket = "{{.Logging.TargetBucket}}"
+		{{- if .Logging.TargetPrefix}}
+		target_prefix = "{{.Logging.TargetPrefix}}"
+		{{- end}}
+	}
+	{{- end}}
+
+	{{- if .Versioning}}
+	versioning {
+		enabled = {{.Versioning.Enabled}}
+		mfa_delete = {{.Versioning.MfaDelete}}
+	}
+	{{- end}}
+
+	{{- if .CorsRule}}
+	cors_rule {
+		{{- if .CorsRule.AllowedHeaders}}
+		allowed_headers = [{{- range .CorsRule.AllowedHeaders}}"{{.}}",{{- end}}]
+		{{- end}}
+		allowed_methods = [{{- range .CorsRule.AllowedMethods}}"{{.}}",{{- end}}]
+		allowed_origins = [{{- range .CorsRule.AllowedOrigins}}"{{.}}",{{- end}}]
+		{{- if .CorsRule.ExposeHeaders}}
+		expose_headers = [{{- range .CorsRule.ExposeHeaders}}"{{.}}",{{- end}}]
+		{{- end}}
+		{{- if .CorsRule.MaxAgeSeconds}}
+		max_age_seconds = {{.CorsRule.MaxAgeSeconds}}
+		{{- end}}
+	}
+	{{- end}}
+
+	{{- if .Website}}
+	website {
+		index_document = "{{.Website.IndexDocument}}"
+		{{- if .Website.ErrorDocument}}
+		error_document = "{{.Website.ErrorDocument}}"
+		{{- end}}
+		{{- if .Website.RedirectAllRequestsTo}}
+		redirect_all_requests_to = "{{.Website.RedirectAllRequestsTo}}"
+		{{- end}}
+		{{- if .Website.RoutingRules}}
+		routing_rules = {{.Website.RoutingRules}}
+		{{- end}}
 	}
 	{{- end}}
 }
 `
 
-func (b Bucket) generateContent() string {
-	t := template.New("Ec2 template")
-	t, err := t.Parse(s3tmpl)
+func (b *Bucket) generateContent() string {
+	if b == nil {
+		return ""
+	}
 
+	t := template.New("S3 Bucket template")
+	t, err := t.Parse(s3tmpl)
 	check(err)
 	var tpl bytes.Buffer
 	err = t.Execute(&tpl, b)

@@ -26,6 +26,10 @@ module:
               ami: xxx
               availability_zone: b
       - name: fileC.tf
+        source:
+          - bucket:
+              name: bucketA
+              bucket: bucket-a
 directory:
   - path: ./dev
     content:

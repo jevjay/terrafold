@@ -6,29 +6,29 @@ import (
 )
 
 type EC2 struct {
-	Name                              string   `yaml:"name"`
-	Ami                               string   `yaml:"ami"`
-	AvailabilityZone                  string   `yaml:"availability_zone"`
-	PlacementGroup                    string   `yaml:"placement_group"`
-	Tenancy                           string   `yaml:"tenancy"`
-	EbsOptimized                      bool     `yaml:"ebs_optimized"`
-	DisableAPITermination             bool     `yaml:"disable_api_termination"`
-	InstanceInitiatedShutdownBehavior string   `yaml:"instance_initiated_shutdown_behavior"`
-	InstanceType                      string   `yaml:"instance_type"`
-	KeyName                           string   `yaml:"key_name"`
-	Monitoring                        bool     `yaml:"monitoring"`
-	SecurityGroups                    []string `yaml:"security_groups"`
-	VpcSecurityGroupIds               []string `yaml:"vpc_security_group_ids"`
-	SubnetID                          string   `yaml:"subnet_id"`
-	AssociatePublicIPAddress          bool     `yaml:"associate_public_ip_address"`
-	PrivateIP                         string   `yaml:"private_ip"`
-	SourceDestCheck                   bool     `yaml:"source_dest_check"`
-	UserData                          string   `yaml:"user_data"`
-	UserDataBase64                    string   `yaml:"user_data_base64"`
-	IamInstanceProfile                string   `yaml:"iam_instance_profile"`
-	IPv6AddressCount                  int      `yaml:"ipv6_address_count"`
-	IPv6Addresses                     []string `yaml:"ipv6_addresses"`
-	VolumeTags                        string   `yaml:"volume_tags"`
+	Name                              string   `yaml:"name,omitempty"`
+	Ami                               string   `yaml:"ami,omitempty"`
+	AvailabilityZone                  string   `yaml:"availability_zone,omitempty"`
+	PlacementGroup                    string   `yaml:"placement_group,omitempty"`
+	Tenancy                           string   `yaml:"tenancy,omitempty"`
+	EbsOptimized                      bool     `yaml:"ebs_optimized,omitempty"`
+	DisableAPITermination             bool     `yaml:"disable_api_termination,omitempty"`
+	InstanceInitiatedShutdownBehavior string   `yaml:"instance_initiated_shutdown_behavior,omitempty"`
+	InstanceType                      string   `yaml:"instance_type,omitempty"`
+	KeyName                           string   `yaml:"key_name,omitempty"`
+	Monitoring                        bool     `yaml:"monitoring,omitempty"`
+	SecurityGroups                    []string `yaml:"security_groups,omitempty"`
+	VpcSecurityGroupIds               []string `yaml:"vpc_security_group_ids,omitempty"`
+	SubnetID                          string   `yaml:"subnet_id,omitempty"`
+	AssociatePublicIPAddress          bool     `yaml:"associate_public_ip_address,omitempty"`
+	PrivateIP                         string   `yaml:"private_ip,omitempty"`
+	SourceDestCheck                   bool     `yaml:"source_dest_check,omitempty"`
+	UserData                          string   `yaml:"user_data,omitempty"`
+	UserDataBase64                    string   `yaml:"user_data_base64,omitempty"`
+	IamInstanceProfile                string   `yaml:"iam_instance_profile,omitempty"`
+	IPv6AddressCount                  int      `yaml:"ipv6_address_count,omitempty"`
+	IPv6Addresses                     []string `yaml:"ipv6_addresses,omitempty"`
+	VolumeTags                        string   `yaml:"volume_tags,omitempty"`
 
 	RootBlockDevice      `yaml:"root_block_device"`
 	EbsBlockDevice       `yaml:"ebs_block_device"`
@@ -144,7 +144,11 @@ resource "aws_instance" "{{.Name}}" {
 }
 `
 
-func (e EC2) generateContent() string {
+func (e *EC2) generateContent() string {
+	if e == nil {
+		return ""
+	}
+
 	t := template.New("Ec2 template")
 	t, err := t.Parse(ec2tmpl)
 
