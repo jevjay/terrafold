@@ -16,115 +16,115 @@ type Bucket struct {
 	Region             string `yaml:"region,omitempty"`
 	RequestPayer       string `yaml:"request_payer,omitempty"`
 
-	ServerSideEncryptionConfiguration `yaml:"server_side_encryption_configuration,omitempty"`
-	ReplicationConfiguration          `yaml:"replication_configuration,omitempty"`
-	LifecycleRule                     `yaml:"lifecycle_rule,omitempty"`
-	Logging                           `yaml:"logging,omitempty"`
-	Versioning                        `yaml:"versioning,omitempty"`
-	CorsRule                          `yaml:"cors_rule,omitempty"`
-	Website                           `yaml:"website,omitempty"`
-	Tags                              `yaml:"tags,omitempty"`
+	ServerSideEncryptionConfiguration *ServerSideEncryptionConfiguration `yaml:"server_side_encryption_configuration,omitempty"`
+	ReplicationConfiguration          *ReplicationConfiguration          `yaml:"replication_configuration,omitempty"`
+	LifecycleRule                     *LifecycleRule                     `yaml:"lifecycle_rule,omitempty"`
+	Logging                           *Logging                           `yaml:"logging,omitempty"`
+	Versioning                        *Versioning                        `yaml:"versioning,omitempty"`
+	CorsRule                          *CorsRule                          `yaml:"cors_rule,omitempty"`
+	Website                           *Website                           `yaml:"website,omitempty"`
+	Tags                              *Tags                              `yaml:"tags,omitempty"`
 }
 
 type LifecycleRule struct {
-	ID                                 string `yaml:"id"`
-	Prefix                             string `yaml:"prefix"`
-	Enabled                            bool   `yaml:"enabled"`
-	AbortIncompleteMultipartUploadDays int    `yaml:"abort_incomplete_multipart_upload_days"`
+	ID                                 string `yaml:"id,omitempty"`
+	Prefix                             string `yaml:"prefix,omitempty"`
+	Enabled                            bool   `yaml:"enabled,omitempty"`
+	AbortIncompleteMultipartUploadDays int    `yaml:"abort_incomplete_multipart_upload_days,omitempty"`
 
-	Expiration                  `yaml:"expiration"`
-	Transition                  `yaml:"transition"`
-	NoncurrentVersionExpiration `yaml:"noncurrent_version_expiration"`
-	NoncurrentVersionTransition `yaml:"noncurrent_version_transition"`
-	Tags                        `yaml:"tags"`
+	Expiration                  `yaml:"expiration,omitempty"`
+	Transition                  `yaml:"transition,omitempty"`
+	NoncurrentVersionExpiration `yaml:"noncurrent_version_expiration,omitempty"`
+	NoncurrentVersionTransition `yaml:"noncurrent_version_transition,omitempty"`
+	Tags                        `yaml:"tags,omitempty"`
 }
 
 type Expiration struct {
-	Date                      string `yaml:"date"`
-	Days                      int    `yaml:"days"`
-	ExpiredObjectDeleteMarker bool   `yaml:"expired_object_delete_marker"`
+	Date                      string `yaml:"date,omitempty"`
+	Days                      int    `yaml:"days,omitempty"`
+	ExpiredObjectDeleteMarker bool   `yaml:"expired_object_delete_marker,omitempty"`
 }
 
 type Transition struct {
-	Date         string `yaml:"tags"`
-	Days         int    `yaml:"days"`
-	StorageClass string `yaml:"storage_class"`
+	Date         string `yaml:"tags,omitempty"`
+	Days         int    `yaml:"days,omitempty"`
+	StorageClass string `yaml:"storage_class,omitempty"`
 }
 
 type NoncurrentVersionExpiration struct {
-	Days int `yaml:"days"`
+	Days int `yaml:"days,omitempty"`
 }
 
 type NoncurrentVersionTransition struct {
-	Days         int    `yaml:"days"`
-	StorageClass string `yaml:"storage_class"`
+	Days         int    `yaml:"days,omitempty"`
+	StorageClass string `yaml:"storage_class,omitempty"`
 }
 
 type Logging struct {
-	TargetBucket string `yaml:"target_bucket"`
-	TargetPrefix string `yaml:"target_prefix"`
+	TargetBucket string `yaml:"target_bucket,omitempty"`
+	TargetPrefix string `yaml:"target_prefix,omitempty"`
 }
 
 type Versioning struct {
-	Enabled   bool `yaml:"enabled"`
-	MfaDelete bool `yaml:"mfa_delete"`
+	Enabled   bool `yaml:"enabled,omitempty"`
+	MfaDelete bool `yaml:"mfa_delete,omitempty"`
 }
 
 type CorsRule struct {
-	AllowedHeaders []string `yaml:"allowed_headers"`
-	AllowedMethods []string `yaml:"allowed_methods"`
-	AllowedOrigins []string `yaml:"allowed_origins"`
-	ExposeHeaders  []string `yaml:"expose_headers"`
-	MaxAgeSeconds  int      `yaml:"max_age_seconds"`
+	AllowedHeaders []string `yaml:"allowed_headers,omitempty"`
+	AllowedMethods []string `yaml:"allowed_methods,omitempty"`
+	AllowedOrigins []string `yaml:"allowed_origins,omitempty"`
+	ExposeHeaders  []string `yaml:"expose_headers,omitempty"`
+	MaxAgeSeconds  int      `yaml:"max_age_seconds,omitempty"`
 }
 
 type ReplicationConfiguration struct {
-	Role string `yaml:"role"`
+	Role string `yaml:"role,omitempty"`
 
-	Rules `yaml:"rules"`
+	Rules `yaml:"rules,omitempty"`
 }
 
 type Rules struct {
-	ID     string `yaml:"id"`
-	Prefix string `yaml:"prefix"`
-	Status string `yaml:"status"`
+	ID     string `yaml:"id,omitempty"`
+	Prefix string `yaml:"prefix,omitempty"`
+	Status string `yaml:"status,omitempty"`
 
-	Destination             `yaml:"destination"`
-	SourceSelectionCriteria `yaml:"source_selection_criteria"`
+	Destination             `yaml:"destination,omitempty"`
+	SourceSelectionCriteria `yaml:"source_selection_criteria,omitempty"`
 }
 
 type Destination struct {
-	Bucket          string `yaml:"id"`
-	StorageClass    string `yaml:"storage_class"`
-	ReplicaKmsKeyID string `yaml:"replica_kms_key_id"`
+	Bucket          string `yaml:"id,omitempty"`
+	StorageClass    string `yaml:"storage_class,omitempty"`
+	ReplicaKmsKeyID string `yaml:"replica_kms_key_id,omitempty"`
 }
 
 type SourceSelectionCriteria struct {
-	SseKmsEncryptedObjects `yaml:"sse_kms_encrypted_objects"`
+	SseKmsEncryptedObjects `yaml:"sse_kms_encrypted_objects,omitempty"`
 }
 
 type SseKmsEncryptedObjects struct {
-	Enabled bool `yaml:"enabled"`
+	Enabled bool `yaml:"enabled,omitempty"`
 }
 
 type ServerSideEncryptionConfiguration struct {
-	Rule `yaml:"rule"`
+	Rule `yaml:"rule,omitempty"`
 }
 
 type Rule struct {
-	ApplyServerSideEncryptionByDefault `yaml:"apply_server_side_encryption_by_default"`
+	ApplyServerSideEncryptionByDefault `yaml:"apply_server_side_encryption_by_default,omitempty"`
 }
 
 type ApplyServerSideEncryptionByDefault struct {
-	SseAlgorithm   string `yaml:"sse_algorithm"`
-	KmsMasterKeyID string `yaml:"kms_master_key_id"`
+	SseAlgorithm   string `yaml:"sse_algorithm,omitempty"`
+	KmsMasterKeyID string `yaml:"kms_master_key_id,omitempty"`
 }
 
 type Website struct {
-	IndexDocument         string `yaml:"index_document"`
-	ErrorDocument         string `yaml:"error_document"`
-	RedirectAllRequestsTo string `yaml:"redirect_all_requests_to"`
-	RoutingRules          string `yaml:"routing_rules"`
+	IndexDocument         string `yaml:"index_document,omitempty"`
+	ErrorDocument         string `yaml:"error_document,omitempty"`
+	RedirectAllRequestsTo string `yaml:"redirect_all_requests_to,omitempty"`
+	RoutingRules          string `yaml:"routing_rules,omitempty"`
 }
 
 const s3tmpl = `
@@ -153,7 +153,6 @@ resource "aws_s3_bucket" "{{.Name}}" {
 	{{- if .RequestPayer}}
 	request_payer = {{.RequestPayer}}
 	{{- end}}
-	
 	{{- if .ServerSideEncryptionConfiguration}}
 	server_side_encryption_configuration {
 		rule {
@@ -164,7 +163,6 @@ resource "aws_s3_bucket" "{{.Name}}" {
 		}
 	}
 	{{- end}}
-
 	{{- if .ReplicationConfiguration}}
 	replication_configuration {
 		role = "{{.ReplicationConfiguration.Role}}"
@@ -174,7 +172,6 @@ resource "aws_s3_bucket" "{{.Name}}" {
 			{{- end}}
 			prefix = "{{.ReplicationConfiguration.Rules.Prefix}}"
 			status = "{{.ReplicationConfiguration.Rules.Status}}"
-
 			destination {
 				bucket = "{{.ReplicationConfiguration.Rules.Destination.Bucket}}"
 				storage_class = "{{.ReplicationConfiguration.Rules.Destination.StorageClass}}"
@@ -190,7 +187,6 @@ resource "aws_s3_bucket" "{{.Name}}" {
 		}
 	}
 	{{- end}}
-
 	{{- if .LifecycleRule}}
 	lifecycle_rule {
 		enabled = "{{.LifecycleRule.Enabled}}"
@@ -203,7 +199,6 @@ resource "aws_s3_bucket" "{{.Name}}" {
 		{{- if .LifecycleRule.AbortIncompleteMultipartUploadDays}}
 		abort_incomplete_multipart_upload_days = {{.LifecycleRule.AbortIncompleteMultipartUploadDays}}
 		{{- end}}
-
 		{{- if .LifecycleRule.Expiration}}
 		expiration {
 			{{- if .LifecycleRule.Expiration.Date}}
@@ -217,7 +212,6 @@ resource "aws_s3_bucket" "{{.Name}}" {
 			{{- end}}
 		}
 		{{- end}}
-
 		{{- if .LifecycleRule.Transition}}
 		transition {
 			{{- if .LifecycleRule.Transition.Days}}
@@ -228,7 +222,6 @@ resource "aws_s3_bucket" "{{.Name}}" {
 			{{- end}}
 		}
 		{{- end}}
-
 		{{- if .LifecycleRule.NoncurrentVersionTransition}}
 		noncurrent_version_transition {
 			{{- if .LifecycleRule.NoncurrentVersionTransition.Days}}
@@ -239,7 +232,6 @@ resource "aws_s3_bucket" "{{.Name}}" {
 			{{- end}}
 		  }
 		{{- end}}
-
 		{{- if .LifecycleRule.NoncurrentVersionExpiration}}
 		noncurrent_version_expiration {
 			{{- if .LifecycleRule.NoncurrentVersionExpiration.Days}}
@@ -249,7 +241,6 @@ resource "aws_s3_bucket" "{{.Name}}" {
 		{{- end}}
 	}
 	{{- end}}
-
 	{{- if .Logging}}
 	logging {
 		target_bucket = "{{.Logging.TargetBucket}}"
@@ -258,14 +249,12 @@ resource "aws_s3_bucket" "{{.Name}}" {
 		{{- end}}
 	}
 	{{- end}}
-
 	{{- if .Versioning}}
 	versioning {
 		enabled = {{.Versioning.Enabled}}
 		mfa_delete = {{.Versioning.MfaDelete}}
 	}
 	{{- end}}
-
 	{{- if .CorsRule}}
 	cors_rule {
 		{{- if .CorsRule.AllowedHeaders}}
@@ -281,7 +270,6 @@ resource "aws_s3_bucket" "{{.Name}}" {
 		{{- end}}
 	}
 	{{- end}}
-
 	{{- if .Website}}
 	website {
 		index_document = "{{.Website.IndexDocument}}"
