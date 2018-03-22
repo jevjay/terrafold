@@ -37,6 +37,7 @@ type Directory []struct {
 type Source []struct {
 	EC2    *EC2
 	Bucket *Bucket
+	RDS    *RDS
 }
 
 type AWSObject interface {
@@ -110,6 +111,7 @@ func main() {
 					for _, sourceType := range source {
 						buffer.WriteString(sourceType.EC2.generateContent())
 						buffer.WriteString(sourceType.Bucket.generateContent())
+						buffer.WriteString(sourceType.RDS.generateContent())
 					}
 
 					createFile(strings.Join([]string{*repo, "modules", moduleName, fileName}, "/"), buffer.String())
