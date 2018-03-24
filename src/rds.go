@@ -21,28 +21,28 @@ type RDS struct {
 const rdstmpl = `
 resource "aws_db_instance" "{{.Name}}-rds" {
 	{{- if .AllocatedStorage}}
-	allocated_storage    = {{.AllocatedStorage}}
+	allocated_storage = {{.AllocatedStorage}}
 	{{- end}}
 	{{- if .StorageType}}
-	storage_type         = "{{.StorageType}}"
+	storage_type = "{{.StorageType}}"
 	{{- end}}
 	{{- if .Engine}}
-	engine               = "{{.Engine}}"
+	engine = "{{.Engine}}"
 	{{- end}}
 	{{- if .EngineVersion}}
-	engine_version       = "{{.EngineVersion}}"
+	engine_version = "{{.EngineVersion}}"
 	{{- end}}
 	{{- if .InstanceClass}}
-	instance_class       = "{{.InstanceClass}}"
+	instance_class = "{{.InstanceClass}}"
 	{{- end}}
 	{{- if .Name}}
-	name                 = "{{.Name}}"
+	name = "{{.Name}}"
 	{{- end}}
 	{{- if .Username}}
-	username             = "{{.Username}}"
+	username = "{{.Username}}"
 	{{- end}}
 	{{- if .Password}}
-	password             = "{{.Password}}"
+	password = "{{.Password}}"
 	{{- end}}
 	{{- if .DbSubnetGroupName}}
 	db_subnet_group_name = "{{.DbSubnetGroupName}}"

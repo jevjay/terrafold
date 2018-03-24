@@ -38,6 +38,7 @@ type Source []struct {
 	EC2    *EC2
 	Bucket *Bucket
 	RDS    *RDS
+	ELB    *ELB
 }
 
 type AWSObject interface {
@@ -112,6 +113,7 @@ func main() {
 						buffer.WriteString(sourceType.EC2.generateContent())
 						buffer.WriteString(sourceType.Bucket.generateContent())
 						buffer.WriteString(sourceType.RDS.generateContent())
+						buffer.WriteString(sourceType.ELB.generateContent())
 					}
 
 					createFile(strings.Join([]string{*repo, "modules", moduleName, fileName}, "/"), buffer.String())
