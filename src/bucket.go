@@ -294,9 +294,17 @@ func (b *Bucket) generateContent() string {
 
 	t := template.New("S3 Bucket template")
 	t, err := t.Parse(s3tmpl)
-	check(err)
+
+	if err != nil {
+		panic(err)
+	}
+
 	var tpl bytes.Buffer
 	err = t.Execute(&tpl, b)
-	check(err)
+
+	if err != nil {
+		panic(err)
+	}
+
 	return tpl.String()
 }

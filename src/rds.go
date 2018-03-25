@@ -58,12 +58,19 @@ func (r *RDS) generateContent() string {
 		return ""
 	}
 
-	t := template.New("Ec2 template")
+	t := template.New("RDS template")
 	t, err := t.Parse(ec2tmpl)
 
-	check(err)
+	if err != nil {
+		panic(err)
+	}
+
 	var tpl bytes.Buffer
 	err = t.Execute(&tpl, r)
-	check(err)
+
+	if err != nil {
+		panic(err)
+	}
+
 	return tpl.String()
 }

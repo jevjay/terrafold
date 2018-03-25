@@ -35,10 +35,15 @@ type Directory []struct {
 }
 
 type Source []struct {
+	// AWS structs
 	EC2    *EC2
 	Bucket *Bucket
 	RDS    *RDS
 	ELB    *ELB
+	// DigitalOcean structs
+	DigitaloceanCertificate
+	DigitaloceanDomain
+	DigitaloceanDroplet
 }
 
 type AWSObject interface {
@@ -114,6 +119,10 @@ func main() {
 						buffer.WriteString(sourceType.Bucket.generateContent())
 						buffer.WriteString(sourceType.RDS.generateContent())
 						buffer.WriteString(sourceType.ELB.generateContent())
+						// Generate DigitalOcean configuration files
+						buffer.WriteString(sourceType.DigitaloceanCertificate.generateContent())
+						buffer.WriteString(sourceType.DigitaloceanDomain.generateContent())
+						buffer.WriteString(sourceType.DigitaloceanDroplet.generateContent())
 					}
 
 					createFile(strings.Join([]string{*repo, "modules", moduleName, fileName}, "/"), buffer.String())

@@ -152,9 +152,16 @@ func (e *EC2) generateContent() string {
 	t := template.New("Ec2 template")
 	t, err := t.Parse(ec2tmpl)
 
-	check(err)
+	if err != nil {
+		panic(err)
+	}
+
 	var tpl bytes.Buffer
 	err = t.Execute(&tpl, e)
-	check(err)
+
+	if err != nil {
+		panic(err)
+	}
+
 	return tpl.String()
 }

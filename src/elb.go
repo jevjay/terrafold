@@ -101,12 +101,19 @@ func (elb *ELB) generateContent() string {
 		return ""
 	}
 
-	t := template.New("Ec2 template")
+	t := template.New("ELB template")
 	t, err := t.Parse(elbtmpl)
 
-	check(err)
+	if err != nil {
+		panic(err)
+	}
+
 	var tpl bytes.Buffer
 	err = t.Execute(&tpl, elb)
-	check(err)
+
+	if err != nil {
+		panic(err)
+	}
+
 	return tpl.String()
 }
