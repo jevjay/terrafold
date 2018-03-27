@@ -26,7 +26,7 @@ func (dc *DigitaloceanDomain) generateContent() string {
 		return ""
 	}
 
-	t := template.New("Ec2 template")
+	t := template.New("Digital Ocean Domain template")
 	t, err := t.Parse(dodomaintmpl)
 
 	if err != nil {

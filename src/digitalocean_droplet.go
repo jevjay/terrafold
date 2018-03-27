@@ -66,7 +66,7 @@ func (dc *DigitaloceanDroplet) generateContent() string {
 		return ""
 	}
 
-	t := template.New("Ec2 template")
+	t := template.New("Digital Ocean Droplet template")
 	t, err := t.Parse(dodroptmpl)
 
 	if err != nil {

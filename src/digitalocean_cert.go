@@ -34,7 +34,7 @@ func (dc *DigitaloceanCertificate) generateContent() string {
 		return ""
 	}
 
-	t := template.New("Ec2 template")
+	t := template.New("Digital Ocean Certificate template")
 	t, err := t.Parse(docerttmpl)
 
 	if err != nil {
